@@ -29,7 +29,7 @@ public class Main {
             fleetManager.addVehicle(new Car("C001", "Toyota Camry", 220));
             fleetManager.addVehicle(new Truck("T001", "Volvo FH16", 140));
             fleetManager.addVehicle(new Airplane("A001", "Boeing 747", 900, 41000));
-            // Add a duplicate model to test distinct model reporting
+            // ive added a duplicate model to test distinct model reporting
             fleetManager.addVehicle(new Car("C002", "Toyota Camry", 220));
             
             System.out.println("\nInitial fleet report:");
@@ -68,9 +68,9 @@ public class Main {
                 case 7: saveFleet(); break;
                 case 8: loadFleet(); break;
                 case 9: searchByType(); break;
-                case 10: sortFleetSubMenu(); break; // NEW for A2
-                case 11: listMaintenanceNeeds(); break; // Re-numbered
-                case 12: running = false; break; // Re-numbered
+                case 10: sortFleetSubMenu(); break; 
+                case 11: listMaintenanceNeeds(); break; 
+                case 12: running = false; break; 
                 default: System.out.println("Invalid option. Please try again.");
             }
         }
