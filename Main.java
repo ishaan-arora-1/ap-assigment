@@ -1,0 +1,237 @@
+import fleet.FleetManager;
+import exceptions.InvalidOperationException;
+import vehicles.abstracts.Vehicle;
+import vehicles.concrete.*;
+
+import java.io.IOException;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+    private static FleetManager fleetManager = new FleetManager();
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        System.out.println("Running Initial Demo");
+        runDemo();
+        
+        System.out.println("\nLaunching Command-Line Interface");
+        runCLI();
+        
+        scanner.close();
+        System.out.println("Exiting application. Goodbye!");
+    }
+
+    private static void runDemo() {
+        try {
+            System.out.println("\nCreating and adding vehicles to the fleet...");
+            fleetManager.addVehicle(new Car("C001", "Toyota Camry", 220));
+            fleetManager.addVehicle(new Truck("T001", "Volvo FH16", 140));
+            fleetManager.addVehicle(new Airplane("A001", "Boeing 747", 900, 41000));
+            
+            System.out.println("\nInitial fleet report:");
+            System.out.println(fleetManager.generateReport());
+
+            System.out.println("\nRefueling all vehicles with 1000 liters...");
+            fleetManager.refuelAll(1000);
+
+            System.out.println("\nSimulating a 100km journey...");
+            fleetManager.startAllJourneys(100);
+
+            System.out.println("\nFleet report after journey:");
+            System.out.println(fleetManager.generateReport());
+
+            System.out.println("\nSaving fleet to 'demo_fleet.csv'...");
+            fleetManager.saveToFile("demo_fleet.csv");
+
+        } catch (Exception e) {
+            System.err.println("An error occurred during the demo: " + e.getMessage());
+        }
+    }
+
+    private static void runCLI() {
+        boolean running = true;
+        while (running) {
+            printMenu();
+            int choice = getUserChoice();
+
+            switch (choice) {
+                case 1: addVehicle(); break;
+                case 2: removeVehicle(); break;
+                case 3: startJourney(); break;
+                case 4: refuelAll(); break;
+                case 5: fleetManager.maintainAll(); break;
+                case 6: System.out.println(fleetManager.generateReport()); break;
+                case 7: saveFleet(); break;
+                case 8: loadFleet(); break;
+                case 9: searchByType(); break;
+                case 10: listMaintenanceNeeds(); break;
+                case 11: running = false; break;
+                default: System.out.println("Invalid option. Please try again.");
+            }
+        }
+    }
+    
+    private static void printMenu() {
+        System.out.println("\nFleet Management System Menu");
+        System.out.println("1. Add Vehicle");
+        System.out.println("2. Remove Vehicle");
+        System.out.println("3. Start Journey for All Vehicles");
+        System.out.println("4. Refuel All Vehicles");
+        System.out.println("5. Perform Maintenance on All");
+        System.out.println("6. Generate Fleet Report");
+        System.out.println("7. Save Fleet to File");
+        System.out.println("8. Load Fleet from File");
+        System.out.println("9. Search by Type");
+        System.out.println("10. List Vehicles Needing Maintenance");
+        System.out.println("11. Exit");
+        System.out.print("Choose an option: ");
+    }
+    
+    private static int getUserChoice() {
+        while (true) {
+            try {
+                int choice = scanner.nextInt();
+                scanner.nextLine();
+                return choice;
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine();
+                System.out.print("Choose an option: ");
+            }
+        }
+    }
+    
+    private static void addVehicle() {
+        try {
+            System.out.print("Enter vehicle type (Car, Truck, Bus, Airplane, CargoShip): ");
+            String type = scanner.nextLine();
+            
+            System.out.print("Enter ID: ");
+            String id = scanner.nextLine();
+            
+            System.out.print("Enter Model: ");
+            String model = scanner.nextLine();
+            
+            System.out.print("Enter Max Speed (km/h): ");
+            double maxSpeed = scanner.nextDouble();
+            scanner.nextLine();
+            
+            Vehicle vehicleToAdd = null;
+            switch(type.toLowerCase()) {
+                case "car":
+                    vehicleToAdd = new Car(id, model, maxSpeed);
+                    break;
+                case "truck":
+                    vehicleToAdd = new Truck(id, model, maxSpeed);
+                    break;
+                case "bus":
+                    vehicleToAdd = new Bus(id, model, maxSpeed);
+                    break;
+                case "airplane":
+                    System.out.print("Enter Max Altitude (ft): ");
+                    double maxAlt = scanner.nextDouble();
+                    scanner.nextLine();
+                    vehicleToAdd = new Airplane(id, model, maxSpeed, maxAlt);
+                    break;
+                case "cargoship":
+                    System.out.print("Does it have a sail? (true/false): ");
+                    boolean hasSail = scanner.nextBoolean();
+                    scanner.nextLine();
+                    vehicleToAdd = new CargoShip(id, model, maxSpeed, hasSail);
+                    break;
+                default:
+                    System.out.println("Invalid vehicle type.");
+                    return;
+            }
+            fleetManager.addVehicle(vehicleToAdd);
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid numeric input.");
+            scanner.nextLine();
+        } catch (InvalidOperationException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private static void removeVehicle() {
+        System.out.print("Enter ID of vehicle to remove: ");
+        String id = scanner.nextLine();
+        try {
+            fleetManager.removeVehicle(id);
+        } catch (InvalidOperationException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private static void startJourney() {
+        try {
+            System.out.print("Enter distance for the journey (km): ");
+            double distance = scanner.nextDouble();
+            scanner.nextLine();
+            fleetManager.startAllJourneys(distance);
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a number for distance.");
+            scanner.nextLine();
+        }
+    }
+
+    private static void refuelAll() {
+        try {
+            System.out.print("Enter amount to refuel (liters): ");
+            double amount = scanner.nextDouble();
+            scanner.nextLine();
+            fleetManager.refuelAll(amount);
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a number for amount.");
+            scanner.nextLine();
+        }
+    }
+
+    private static void saveFleet() {
+        System.out.print("Enter filename to save (e.g., my_fleet.csv): ");
+        String filename = scanner.nextLine();
+        try {
+            fleetManager.saveToFile(filename);
+        } catch (IOException e) {
+            System.out.println("Could not save file: " + e.getMessage());
+        }
+    }
+
+    private static void loadFleet() {
+        System.out.print("Enter filename to load (e.g., sample_fleet.csv): ");
+        String filename = scanner.nextLine();
+        try {
+            fleetManager.loadFromFile(filename);
+        } catch (IOException e) {
+            System.out.println("Could not load file: " + e.getMessage());
+        }
+    }
+    
+    private static void searchByType() {
+        System.out.print("Enter vehicle type to search for (e.g., Car, Truck): ");
+        String type = scanner.nextLine();
+        List<Vehicle> results = fleetManager.searchByType(type);
+
+        if (results.isEmpty()) {
+            System.out.println("No vehicles of type '" + type + "' found.");
+        } else {
+            System.out.println("\nFound " + results.size() + " vehicle(s) of type '" + type + "':");
+            for (Vehicle v : results) {
+                v.displayInfo(); // Use the built-in display method
+            }
+        }
+    }
+    
+    private static void listMaintenanceNeeds() {
+        List<Vehicle> needsMaintenance = fleetManager.getVehiclesNeedingMaintenance();
+        if (needsMaintenance.isEmpty()) {
+            System.out.println("No vehicles currently need maintenance.");
+        } else {
+            System.out.println("\nVehicles Needing Maintenance");
+            for (Vehicle v : needsMaintenance) {
+                System.out.println("ID: " + v.getId() + ", Type: " + v.getClass().getSimpleName() + ", Mileage: " + v.getCurrentMileage() + " km");
+            }
+        }
+    }
+}
