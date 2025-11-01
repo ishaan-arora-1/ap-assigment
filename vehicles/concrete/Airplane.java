@@ -115,6 +115,37 @@ public class Airplane extends AirVehicle implements FuelConsumable, PassengerCar
     }
 
     @Override
+    public void setCurrentPassengers(int count) throws OverloadException {
+        if (count < 0 || count > this.passengerCapacity) {
+            throw new OverloadException("Invalid initial passenger count.");
+        }
+        this.currentPassengers = count;
+    }
+
+    @Override
+    public void setCurrentCargo(double weight) throws OverloadException {
+        if (weight < 0 || weight > this.cargoCapacity) {
+            throw new OverloadException("Invalid initial cargo weight.");
+        }
+        this.currentCargo = weight;
+    }
+
+    @Override
+    public void setFuelLevel(double amount) {
+        this.fuelLevel = amount; // Used for loading from file
+    }
+
+    @Override
+    public void setMileageAtLastService(double mileage) {
+        this.mileageAtLastService = mileage;
+    }
+
+    @Override
+    public void setMaintenanceNeeded(boolean needed) {
+        this.maintenanceNeeded = needed;
+    }
+
+    @Override
     public void move(double distance) throws InvalidOperationException {
         if (distance <= 0) throw new InvalidOperationException("Distance must be positive");
         try {

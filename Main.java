@@ -1,7 +1,10 @@
 import fleet.FleetManager;
 import exceptions.InvalidOperationException;
+import exceptions.OverloadException;
 import vehicles.abstracts.Vehicle;
 import vehicles.concrete.*;
+import vehicles.interfaces.PassengerCarrier;
+import vehicles.interfaces.CargoCarrier;
 
 import java.io.IOException;
 import java.util.InputMismatchException;
@@ -153,41 +156,57 @@ public class Main {
             
             System.out.print("Enter Max Speed (km/h): ");
             double maxSpeed = scanner.nextDouble();
-            scanner.nextLine();
+            scanner.nextLine(); // consume newline
             
-            Vehicle vehicleToAdd = null;
+            Vehicle v = null;
+            
             switch(type.toLowerCase()) {
                 case "car":
-                    vehicleToAdd = new Car(id, model, maxSpeed);
+                    v = new Car(id, model, maxSpeed);
                     break;
                 case "truck":
-                    vehicleToAdd = new Truck(id, model, maxSpeed);
+                    v = new Truck(id, model, maxSpeed);
                     break;
                 case "bus":
-                    vehicleToAdd = new Bus(id, model, maxSpeed);
+                    v = new Bus(id, model, maxSpeed);
                     break;
                 case "airplane":
                     System.out.print("Enter Max Altitude (ft): ");
                     double maxAlt = scanner.nextDouble();
                     scanner.nextLine();
-                    vehicleToAdd = new Airplane(id, model, maxSpeed, maxAlt);
+                    v = new Airplane(id, model, maxSpeed, maxAlt);
                     break;
                 case "cargoship":
                     System.out.print("Does it have a sail? (true/false): ");
                     boolean hasSail = scanner.nextBoolean();
                     scanner.nextLine();
-                    vehicleToAdd = new CargoShip(id, model, maxSpeed, hasSail);
+                    v = new CargoShip(id, model, maxSpeed, hasSail);
                     break;
                 default:
                     System.out.println("Invalid vehicle type.");
                     return;
             }
-            fleetManager.addVehicle(vehicleToAdd);
+            if (v instanceof PassengerCarrier) {
+                System.out.print("Enter initial passengers: ");
+                int passengers = scanner.nextInt();
+                scanner.nextLine();
+                ((PassengerCarrier) v).setCurrentPassengers(passengers);
+            }
+            
+            if (v instanceof CargoCarrier) {
+                System.out.print("Enter initial cargo (kg): ");
+                double cargo = scanner.nextDouble();
+                scanner.nextLine();
+                ((CargoCarrier) v).setCurrentCargo(cargo);
+            }
+
+            fleetManager.addVehicle(v);
+
         } catch (InputMismatchException e) {
             System.out.println("Invalid numeric input.");
             scanner.nextLine();
-        } catch (InvalidOperationException e) {
-            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) { // Catches OverloadException and InvalidOperationException
+            System.out.println("Error adding vehicle: " + e.getMessage());
         }
     }
 

@@ -3,31 +3,31 @@ package fleet;
 import exceptions.InvalidOperationException;
 import vehicles.abstracts.Vehicle;
 import vehicles.concrete.*;
+import vehicles.interfaces.CargoCarrier;
 import vehicles.interfaces.FuelConsumable;
 import vehicles.interfaces.Maintainable;
+import vehicles.interfaces.PassengerCarrier;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator; // Added for A2
+import java.util.Comparator; 
 import java.util.HashMap;
-import java.util.HashSet; // Added for A2
+import java.util.HashSet; 
 import java.util.List;
 import java.util.Map;
-import java.util.Set; // Added for A2
+import java.util.Set; 
 import java.util.stream.Collectors;
 
 /**
- * Manages the fleet of vehicles.
- * For Assignment 2, this class is updated to demonstrate:
- * - Use of ArrayList for dynamic storage.
- * - Use of HashSet (in generateReport) for finding distinct models.
- * - Use of Comparators (lambda expressions) for sorting by different criteria.
- * - Use of Collections.max/min for data analysis (fastest/slowest).
+use of ArrayList for dynamic storage.
+use of HashSet for finding distinct models.
+use of Comparators with collection.sort().
+use of Collections.max and min.
  */
 public class FleetManager {
     // 1. Use of Collections (ArrayList)
-    // This ArrayList is the primary collection for dynamic vehicle storage[cite: 24, 35].
+    // This ArrayList is the primary collection for dynamic vehicle storage.
     private List<Vehicle> fleet;
 
     public FleetManager() {
@@ -104,33 +104,32 @@ public class FleetManager {
         return foundVehicles;
     }
 
-    // --- NEW & UPDATED METHODS FOR ASSIGNMENT 2 ---
+    // methods of assignment 2
 
-    // 2. Sorting and Ordering (Comparable) [cite: 75]
-    // This method (from A1) uses the "Comparable" interface implemented in Vehicle.
+    // 2. Sorting and Ordering 
+    // This method uses the "Comparable" interface implemented in Vehicle.
     public void sortFleetByEfficiency() {
         Collections.sort(fleet);
         System.out.println("Fleet sorted by fuel efficiency (highest first).");
     }
 
-    // 2. Sorting and Ordering (Comparator) 
-    // New method for A2. Uses a lambda expression as a Comparator to sort by speed.
+    // 2. Sorting and Ordering 
+    // New method 
     public void sortFleetByMaxSpeed() {
         // Sorts from highest speed to lowest
         fleet.sort(Comparator.comparingDouble(Vehicle::getMaxSpeed).reversed());
         System.out.println("Fleet sorted by max speed (fastest first).");
     }
 
-    // 2. Sorting and Ordering (Comparator) 
-    // New method for A2. Uses a Comparator to sort by model name alphabetically.
+    // New method
     public void sortFleetByModelName() { // sorting done instead of tree set as allowed in the assigment - task 2
         // Sorts alphabetically (A-Z) by model name
         fleet.sort(Comparator.comparing(Vehicle::getModel, String.CASE_INSENSITIVE_ORDER));
         System.out.println("Fleet sorted by model name (A-Z).");
     }
 
-    // 3. Data Analysis & Use of Collections (HashSet) [cite: 25, 36]
-    // New helper method for A2. Demonstrates HashSet to find unique model names.
+    // 3.  Use of HashSet
+    // New for A2. Demonstrates HashSet
     private Set<String> getDistinctModels() { // i have used hashset as told in the assignment - task 2
         Set<String> models = new HashSet<>();
         for (Vehicle v : fleet) {
@@ -139,23 +138,23 @@ public class FleetManager {
         return models;
     }
 
-    // 4. Data Analysis (Collections.max/min) [cite: 27]
-    // New helper method for A2. Finds the fastest vehicle.
+    // Collections.max/min 
+    // New for A2. Finds the fastest vehicle.
     private Vehicle getFastestVehicle() {
         if (fleet.isEmpty()) return null;
         // Uses Collections.max with a Comparator to find the vehicle with the highest maxSpeed.
         return Collections.max(fleet, Comparator.comparingDouble(Vehicle::getMaxSpeed)); // used collection max as told in the assignment - task 3
     }
 
-    // 4. Data Analysis (Collections.max/min) [cite: 27]
-    // New helper method for A2. Finds the slowest vehicle.
+    // 4. collections max/min 
+    // New for A2. Finds the slowest vehicle.
     private Vehicle getSlowestVehicle() {
         if (fleet.isEmpty()) return null;
         // Uses Collections.min with a Comparator to find the vehicle with the lowest maxSpeed.
         return Collections.min(fleet, Comparator.comparingDouble(Vehicle::getMaxSpeed));
     }
 
-    // 5. Reporting (Updated for A2) [cite: 39]
+    // 5. Reporting
     // Updated to include distinct models, fastest, and slowest vehicles.
     public String generateReport() {
         if (fleet.isEmpty()) {
@@ -202,7 +201,6 @@ public class FleetManager {
             averageEfficiency = totalEfficiency / fuelVehicleCount;
         }
 
-        // --- NEW REPORTING SECTION FOR A2 ---
         Set<String> distinctModels = getDistinctModels();
         Vehicle fastest = getFastestVehicle();
         Vehicle slowest = getSlowestVehicle();
@@ -223,15 +221,14 @@ public class FleetManager {
         for (Map.Entry<String, Integer> entry : typeCounts.entrySet()) {
             report.append("  - ").append(entry.getKey()).append("s: ").append(entry.getValue()).append("\n");
         }
-        // --- END OF NEW A2 SECTION ---
 
         return report.toString();
     }
 
-    // --- PERSISTENCE METHODS (From A1, satisfy A2 requirements) [cite: 29, 38] ---
+    // --- PERSISTENCE METHODS ---
 
     public void saveToFile(String filename) throws IOException {
-        // Using try-with-resources as required [cite: 44]
+        // Using try-with-resources as required
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
             for (Vehicle v : fleet) {
                 String csvLine = vehicleToCsv(v);
@@ -258,7 +255,7 @@ public class FleetManager {
                     Vehicle v = createVehicleFromCsv(line);
                     fleet.add(v);
                 } catch (Exception e) {
-                    // Handles malformed files gracefully [cite: 30, 81]
+                    // Handles malformed files gracefully 
                     System.err.println("Warning: Skipping malformed line in CSV: " + line);
                 }
             }
@@ -271,77 +268,125 @@ public class FleetManager {
         }
     }
 
+    /**
+     * Converts a Vehicle object into a CSV string.
+     * Order:
+     * 0-Type, 1-ID, 2-Model, 3-MaxSpeed, 4-Mileage, 5-Efficiency,
+     * 6-FuelLevel, 7-MaintenanceNeeded, 8-MileageAtLastService,
+     * 9+ (Vehicle-specific data)
+     */
     private String vehicleToCsv(Vehicle v) {
+        // Common data for all vehicles
         String commonData = String.join(",",
             v.getClass().getSimpleName(),
             v.getId(),
             v.getModel(),
             String.valueOf(v.getMaxSpeed()),
-            String.valueOf(v.getCurrentMileage())
+            String.valueOf(v.getCurrentMileage()),
+            String.valueOf(v.calculateFuelEfficiency()), 
+            (v instanceof FuelConsumable) ? String.valueOf(((FuelConsumable) v).getFuelLevel()) : "0.0",
+            (v instanceof Maintainable) ? String.valueOf(getMaintenanceFlag((Maintainable) v)) : "false",
+            (v instanceof Maintainable) ? String.valueOf(getMaintenanceMileage((Maintainable) v)) : "0.0"
         );
 
+        // Add type-specific data
+        String specificData = "";
         if (v instanceof Car) {
-            Car c = (Car) v;
-            return commonData + "," + c.getFuelLevel() + "," + c.getCurrentPassengers();
+            specificData = "," + ((Car) v).getCurrentPassengers();
+        } else if (v instanceof Truck) {
+            specificData = "," + ((Truck) v).getCurrentCargo();
+        } else if (v instanceof Bus) {
+            specificData = "," + ((Bus) v).getCurrentPassengers() + "," + ((Bus) v).getCurrentCargo();
+        } else if (v instanceof Airplane) {
+            specificData = "," + ((Airplane) v).getMaxAltitude() + "," + ((Airplane) v).getCurrentPassengers() + "," + ((Airplane) v).getCurrentCargo();
+        } else if (v instanceof CargoShip) {
+            specificData = "," + ((CargoShip) v).hasSail() + "," + ((CargoShip) v).getCurrentCargo();
         }
-        if (v instanceof Truck) {
-            Truck t = (Truck) v;
-            return commonData + "," + t.getFuelLevel() + "," + t.getCurrentCargo();
+        
+        return commonData + specificData;
+    }
+    
+    // Helper methods using reflection to access private fields for persistence
+    private double getMaintenanceMileage(Maintainable m) {
+        try {
+            java.lang.reflect.Field field = m.getClass().getDeclaredField("mileageAtLastService");
+            field.setAccessible(true);
+            return field.getDouble(m);
+        } catch (Exception e) {
+            return 0.0;
         }
-        if (v instanceof Bus) {
-            Bus b = (Bus) v;
-            return commonData + "," + b.getFuelLevel() + "," + b.getCurrentPassengers() + "," + b.getCurrentCargo();
+    }
+    
+    private boolean getMaintenanceFlag(Maintainable m) {
+        try {
+            java.lang.reflect.Field field = m.getClass().getDeclaredField("maintenanceNeeded");
+            field.setAccessible(true);
+            return field.getBoolean(m);
+        } catch (Exception e) {
+            return false;
         }
-        if (v instanceof Airplane) {
-            Airplane a = (Airplane) v;
-            return commonData + "," + a.getMaxAltitude() + "," + a.getFuelLevel() + "," + a.getCurrentPassengers() + "," + a.getCurrentCargo();
-        }
-        if (v instanceof CargoShip) {
-            CargoShip cs = (CargoShip) v;
-            return commonData + "," + cs.hasSail() + "," + cs.getCurrentCargo();
-        }
-        return commonData;
     }
 
+    /**
+     * Creates a Vehicle object by parsing a line of CSV text.
+     */
     private Vehicle createVehicleFromCsv(String line) throws Exception {
         String[] data = line.split(",");
+        
+        // Read common base data (indices up to 8 are the same for all types)
         String type = data[0].trim();
         String id = data[1].trim();
         String model = data[2].trim();
         double maxSpeed = Double.parseDouble(data[3].trim());
-        double mileage = Double.parseDouble(data[4].trim()); // <-- LOAD MILEAGE
-    
-        Vehicle v = null; // Create vehicle first
-    
+        double mileage = Double.parseDouble(data[4].trim());
+        // data[5] is efficiency, which is calculated, so we just read and skip it
+        double fuelLevel = Double.parseDouble(data[6].trim());
+        boolean maintenanceNeeded = Boolean.parseBoolean(data[7].trim());
+        double mileageAtLastService = Double.parseDouble(data[8].trim());
+
+        Vehicle v = null;
+        int dataIndex = 9; // Start index for type-specific data
+
+        // Create the specific vehicle object and read its type-specific data
         switch (type) {
             case "Car":
                 v = new Car(id, model, maxSpeed);
-                // You would also load fuel, passengers, etc. here
-                // Example: ((Car) v).refuel(Double.parseDouble(data[5].trim()));
+                ((Car) v).setCurrentPassengers(Integer.parseInt(data[dataIndex++].trim()));
                 break;
             case "Truck":
                 v = new Truck(id, model, maxSpeed);
-                // Example: ((Truck) v).refuel(Double.parseDouble(data[5].trim()));
+                ((Truck) v).setCurrentCargo(Double.parseDouble(data[dataIndex++].trim()));
                 break;
             case "Bus":
                 v = new Bus(id, model, maxSpeed);
+                ((Bus) v).setCurrentPassengers(Integer.parseInt(data[dataIndex++].trim()));
+                ((Bus) v).setCurrentCargo(Double.parseDouble(data[dataIndex++].trim()));
                 break;
             case "Airplane":
-                double maxAltitude = Double.parseDouble(data[5].trim());
+                double maxAltitude = Double.parseDouble(data[dataIndex++].trim());
                 v = new Airplane(id, model, maxSpeed, maxAltitude);
+                ((Airplane) v).setCurrentPassengers(Integer.parseInt(data[dataIndex++].trim()));
+                ((Airplane) v).setCurrentCargo(Double.parseDouble(data[dataIndex++].trim()));
                 break;
             case "CargoShip":
-                boolean hasSail = Boolean.parseBoolean(data[5].trim());
+                boolean hasSail = Boolean.parseBoolean(data[dataIndex++].trim());
                 v = new CargoShip(id, model, maxSpeed, hasSail);
+                ((CargoShip) v).setCurrentCargo(Double.parseDouble(data[dataIndex++].trim()));
                 break;
             default:
                 throw new IllegalArgumentException("Unknown vehicle type in CSV: " + type);
         }
-        
+
         if (v != null) {
-            v.setMileage(mileage); // <-- SET THE MILEAGE
+            v.setMileage(mileage);
+            if (v instanceof FuelConsumable) {
+                ((FuelConsumable) v).setFuelLevel(fuelLevel);
+            }
+            if (v instanceof Maintainable) {
+                ((Maintainable) v).setMaintenanceNeeded(maintenanceNeeded);
+                ((Maintainable) v).setMileageAtLastService(mileageAtLastService);
+            }
         }
-        
         return v;
     }
 }

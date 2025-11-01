@@ -8,4 +8,5 @@ public interface PassengerCarrier {
     void disembarkPassengers(int count) throws InvalidOperationException;
     int getPassengerCapacity();
     int getCurrentPassengers();
+    void setCurrentPassengers(int count) throws OverloadException;
 }

@@ -8,4 +8,5 @@ public interface CargoCarrier {
     void unloadCargo(double weight) throws InvalidOperationException;
     double getCargoCapacity();
     double getCurrentCargo();
+    void setCurrentCargo(double weight) throws OverloadException;
 }

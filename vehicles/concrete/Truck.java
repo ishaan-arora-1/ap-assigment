@@ -42,7 +42,7 @@ public class Truck extends LandVehicle implements FuelConsumable, CargoCarrier, 
     @Override
     public double calculateFuelEfficiency() {
         double baseEfficiency = 8.0; 
-        if (currentCargo > cargoCapacity * 0.5) {
+        if (this.currentCargo > (this.cargoCapacity * 0.5)) { // As per A1 PDF
             return baseEfficiency * 0.9; // 10% reduction
         }
         return baseEfficiency;
@@ -104,5 +104,28 @@ public class Truck extends LandVehicle implements FuelConsumable, CargoCarrier, 
         this.maintenanceNeeded = false;
         this.mileageAtLastService = getCurrentMileage();
         System.out.println("Maintenance performed on Truck " + getId() + ".");
+    }
+
+    @Override
+    public void setCurrentCargo(double weight) throws OverloadException {
+        if (weight < 0 || weight > this.cargoCapacity) {
+            throw new OverloadException("Invalid initial cargo weight.");
+        }
+        this.currentCargo = weight;
+    }
+
+    @Override
+    public void setFuelLevel(double amount) {
+        this.fuelLevel = amount; // Used for loading from file
+    }
+
+    @Override
+    public void setMileageAtLastService(double mileage) {
+        this.mileageAtLastService = mileage;
+    }
+
+    @Override
+    public void setMaintenanceNeeded(boolean needed) {
+        this.maintenanceNeeded = needed;
     }
 }

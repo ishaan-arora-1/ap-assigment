@@ -72,6 +72,29 @@ public class CargoShip extends WaterVehicle implements CargoCarrier, Maintainabl
     }
 
     @Override
+    public void setCurrentCargo(double weight) throws OverloadException {
+        if (weight < 0 || weight > this.cargoCapacity) {
+            throw new OverloadException("Invalid initial cargo weight.");
+        }
+        this.currentCargo = weight;
+    }
+
+    @Override
+    public void setFuelLevel(double amount) {
+        this.fuelLevel = amount; // Used for loading from file
+    }
+
+    @Override
+    public void setMileageAtLastService(double mileage) {
+        this.mileageAtLastService = mileage;
+    }
+
+    @Override
+    public void setMaintenanceNeeded(boolean needed) {
+        this.maintenanceNeeded = needed;
+    }
+
+    @Override
     public void refuel(double amount) throws InvalidOperationException {
         if (hasSail()) throw new InvalidOperationException("Sailing ships do not consume fuel.");
         if (amount <= 0) throw new InvalidOperationException("Refuel amount must be positive.");
