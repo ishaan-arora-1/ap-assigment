@@ -15,6 +15,7 @@ public class Main {
     private static FleetManager fleetManager = new FleetManager();
     private static Scanner scanner = new Scanner(System.in);
 
+    // Runs demo then starts interactive menu
     public static void main(String[] args) {
         System.out.println("Running Initial Demo (Assignment 2 Version)");
         runDemo();
@@ -26,6 +27,7 @@ public class Main {
         System.out.println("Exiting application. Goodbye!");
     }
 
+    // Demonstrates basic fleet operations
     private static void runDemo() {
         try {
             System.out.println("\nCreating and adding vehicles to the fleet...");
@@ -55,6 +57,7 @@ public class Main {
         }
     }
 
+    // Main menu loop for user interactions
     private static void runCLI() {
         boolean running = true;
         while (running) {
@@ -79,7 +82,7 @@ public class Main {
         }
     }
     
-    // Updated menu for A2
+    // Displays menu options to user
     private static void printMenu() {
         System.out.println("\nFleet Management System Menu");
         System.out.println("1. Add Vehicle");
@@ -97,7 +100,7 @@ public class Main {
         System.out.print("Choose an option: ");
     }
     
-    // New sub-menu method for A2 
+    // Shows sorting options and applies selected sort
     private static void sortFleetSubMenu() {
         System.out.println("\n--- Sort Fleet By ---");
         System.out.println("1. Fuel Efficiency (Highest First)");
@@ -129,6 +132,7 @@ public class Main {
         }
     }
     
+    // Handles numeric input with error checking
     private static int getUserChoice() {
         while (true) {
             try {
@@ -143,6 +147,7 @@ public class Main {
         }
     }
     
+    // Prompts user for vehicle details and adds to fleet
     private static void addVehicle() {
         try {
             System.out.print("Enter vehicle type (Car, Truck, Bus, Airplane, CargoShip): ");
@@ -186,6 +191,7 @@ public class Main {
                     System.out.println("Invalid vehicle type.");
                     return;
             }
+            // Set initial passengers and cargo if applicable
             if (v instanceof PassengerCarrier) {
                 System.out.print("Enter initial passengers: ");
                 int passengers = scanner.nextInt();
@@ -210,6 +216,7 @@ public class Main {
         }
     }
 
+    // Removes vehicle by ID
     private static void removeVehicle() {
         System.out.print("Enter ID of vehicle to remove: ");
         String id = scanner.nextLine();
@@ -220,6 +227,7 @@ public class Main {
         }
     }
 
+    // Starts journey for all vehicles at specified distance
     private static void startJourney() {
         try {
             System.out.print("Enter distance for the journey (km): ");
@@ -232,6 +240,7 @@ public class Main {
         }
     }
 
+    // Refuels all fuel-consuming vehicles
     private static void refuelAll() {
         try {
             System.out.print("Enter amount to refuel (liters): ");
@@ -244,6 +253,7 @@ public class Main {
         }
     }
 
+    // Saves current fleet to CSV file
     private static void saveFleet() {
         System.out.print("Enter filename to save (e.g., fleetdata.csv): ");
         String filename = scanner.nextLine();
@@ -254,6 +264,7 @@ public class Main {
         }
     }
 
+    // Loads fleet from CSV file
     private static void loadFleet() {
         System.out.print("Enter filename to load (e.g., fleetdata.csv): ");
         String filename = scanner.nextLine();
@@ -264,6 +275,7 @@ public class Main {
         }
     }
     
+    // Searches and displays vehicles of specified type
     private static void searchByType() {
         System.out.print("Enter vehicle type to search for (e.g., Car, Truck): ");
         String type = scanner.nextLine();
@@ -279,6 +291,7 @@ public class Main {
         }
     }
     
+    // Lists all vehicles that require maintenance
     private static void listMaintenanceNeeds() {
         List<Vehicle> needsMaintenance = fleetManager.getVehiclesNeedingMaintenance();
         if (needsMaintenance.isEmpty()) {

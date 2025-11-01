@@ -34,6 +34,7 @@ public class FleetManager {
         this.fleet = new ArrayList<>(); // i have used array list as told in the assignment - task 1
     }
 
+    // Checks for duplicate ID before adding
     public void addVehicle(Vehicle v) throws InvalidOperationException {
         for (Vehicle vehicle : fleet) {
             if (vehicle.getId().equalsIgnoreCase(v.getId())) {
@@ -52,6 +53,7 @@ public class FleetManager {
         System.out.println("Vehicle " + id + " removed.");
     }
 
+    // Moves all vehicles, continues even if some fail
     public void startAllJourneys(double distance) {
         System.out.println("Starting all journeys of " + distance + " km");
         for (Vehicle v : fleet) {
@@ -94,6 +96,7 @@ public class FleetManager {
                 .collect(Collectors.toList());
     }
 
+    // Returns all vehicles matching the given type name
     public List<Vehicle> searchByType(String type) {
         List<Vehicle> foundVehicles = new ArrayList<>();
         for (Vehicle v : fleet) {
@@ -104,33 +107,26 @@ public class FleetManager {
         return foundVehicles;
     }
 
-    // methods of assignment 2
-
-    // 2. Sorting and Ordering 
-    // This method uses the "Comparable" interface implemented in Vehicle.
+    // Sorts by fuel efficiency, highest first
     public void sortFleetByEfficiency() {
         Collections.sort(fleet);
         System.out.println("Fleet sorted by fuel efficiency (highest first).");
     }
 
-    // 2. Sorting and Ordering 
-    // New method 
+    // Sorts by speed, fastest first
     public void sortFleetByMaxSpeed() {
-        // Sorts from highest speed to lowest
         fleet.sort(Comparator.comparingDouble(Vehicle::getMaxSpeed).reversed());
         System.out.println("Fleet sorted by max speed (fastest first).");
     }
 
-    // New method
-    public void sortFleetByModelName() { // sorting done instead of tree set as allowed in the assigment - task 2
-        // Sorts alphabetically (A-Z) by model name
+    // Sorts alphabetically by model name
+    public void sortFleetByModelName() {
         fleet.sort(Comparator.comparing(Vehicle::getModel, String.CASE_INSENSITIVE_ORDER));
         System.out.println("Fleet sorted by model name (A-Z).");
     }
 
-    // 3.  Use of HashSet
-    // New for A2. Demonstrates HashSet
-    private Set<String> getDistinctModels() { // i have used hashset as told in the assignment - task 2
+    // Gets unique model names using HashSet
+    private Set<String> getDistinctModels() {
         Set<String> models = new HashSet<>();
         for (Vehicle v : fleet) {
             models.add(v.getModel());
@@ -138,24 +134,19 @@ public class FleetManager {
         return models;
     }
 
-    // Collections.max/min 
-    // New for A2. Finds the fastest vehicle.
+    // Finds vehicle with highest max speed
     private Vehicle getFastestVehicle() {
         if (fleet.isEmpty()) return null;
-        // Uses Collections.max with a Comparator to find the vehicle with the highest maxSpeed.
-        return Collections.max(fleet, Comparator.comparingDouble(Vehicle::getMaxSpeed)); // used collection max as told in the assignment - task 3
+        return Collections.max(fleet, Comparator.comparingDouble(Vehicle::getMaxSpeed));
     }
 
-    // 4. collections max/min 
-    // New for A2. Finds the slowest vehicle.
+    // Finds vehicle with lowest max speed
     private Vehicle getSlowestVehicle() {
         if (fleet.isEmpty()) return null;
-        // Uses Collections.min with a Comparator to find the vehicle with the lowest maxSpeed.
         return Collections.min(fleet, Comparator.comparingDouble(Vehicle::getMaxSpeed));
     }
 
-    // 5. Reporting
-    // Updated to include distinct models, fastest, and slowest vehicles.
+    // Generates comprehensive fleet status report
     public String generateReport() {
         if (fleet.isEmpty()) {
             return "The fleet is currently empty.";
@@ -242,6 +233,7 @@ public class FleetManager {
         }
     }
 
+    // Loads fleet from CSV, skips invalid lines
     public void loadFromFile(String filename) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             fleet.clear();
@@ -255,7 +247,6 @@ public class FleetManager {
                     Vehicle v = createVehicleFromCsv(line);
                     fleet.add(v);
                 } catch (Exception e) {
-                    // Handles malformed files gracefully 
                     System.err.println("Warning: Skipping malformed line in CSV: " + line);
                 }
             }
@@ -306,7 +297,7 @@ public class FleetManager {
         return commonData + specificData;
     }
     
-    // Helper methods using reflection to access private fields for persistence
+    // Helper methods to read maintenance fields for CSV saving
     private double getMaintenanceMileage(Maintainable m) {
         try {
             java.lang.reflect.Field field = m.getClass().getDeclaredField("mileageAtLastService");
