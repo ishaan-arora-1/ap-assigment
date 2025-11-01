@@ -13,7 +13,7 @@ public class Main {
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        System.out.println("Running Initial Demo");
+        System.out.println("Running Initial Demo (Assignment 2 Version)");
         runDemo();
         
         System.out.println("\nLaunching Command-Line Interface");
@@ -29,6 +29,8 @@ public class Main {
             fleetManager.addVehicle(new Car("C001", "Toyota Camry", 220));
             fleetManager.addVehicle(new Truck("T001", "Volvo FH16", 140));
             fleetManager.addVehicle(new Airplane("A001", "Boeing 747", 900, 41000));
+            // Add a duplicate model to test distinct model reporting
+            fleetManager.addVehicle(new Car("C002", "Toyota Camry", 220));
             
             System.out.println("\nInitial fleet report:");
             System.out.println(fleetManager.generateReport());
@@ -66,13 +68,15 @@ public class Main {
                 case 7: saveFleet(); break;
                 case 8: loadFleet(); break;
                 case 9: searchByType(); break;
-                case 10: listMaintenanceNeeds(); break;
-                case 11: running = false; break;
+                case 10: sortFleetSubMenu(); break; // NEW for A2
+                case 11: listMaintenanceNeeds(); break; // Re-numbered
+                case 12: running = false; break; // Re-numbered
                 default: System.out.println("Invalid option. Please try again.");
             }
         }
     }
     
+    // Updated menu for A2
     private static void printMenu() {
         System.out.println("\nFleet Management System Menu");
         System.out.println("1. Add Vehicle");
@@ -84,9 +88,42 @@ public class Main {
         System.out.println("7. Save Fleet to File");
         System.out.println("8. Load Fleet from File");
         System.out.println("9. Search by Type");
-        System.out.println("10. List Vehicles Needing Maintenance");
-        System.out.println("11. Exit");
+        System.out.println("10. Sort Fleet"); // NEW for A2
+        System.out.println("11. List Vehicles Needing Maintenance"); // Re-numbered
+        System.out.println("12. Exit"); // Re-numbered
         System.out.print("Choose an option: ");
+    }
+    
+    // New sub-menu method for A2 
+    private static void sortFleetSubMenu() {
+        System.out.println("\n--- Sort Fleet By ---");
+        System.out.println("1. Fuel Efficiency (Highest First)");
+        System.out.println("2. Max Speed (Fastest First)");
+        System.out.println("3. Model Name (A-Z)");
+        System.out.println("4. Cancel");
+        System.out.print("Choose sorting option: ");
+        
+        int choice = getUserChoice();
+        switch (choice) {
+            case 1:
+                fleetManager.sortFleetByEfficiency();
+                break;
+            case 2:
+                fleetManager.sortFleetByMaxSpeed();
+                break;
+            case 3:
+                fleetManager.sortFleetByModelName();
+                break;
+            case 4:
+                System.out.println("Sorting cancelled.");
+                break;
+            default:
+                System.out.println("Invalid sort option.");
+        }
+        // Display the report after sorting to show the result
+        if (choice >= 1 && choice <= 3) {
+            System.out.println(fleetManager.generateReport());
+        }
     }
     
     private static int getUserChoice() {
@@ -189,7 +226,7 @@ public class Main {
     }
 
     private static void saveFleet() {
-        System.out.print("Enter filename to save (e.g., my_fleet.csv): ");
+        System.out.print("Enter filename to save (e.g., fleetdata.csv): ");
         String filename = scanner.nextLine();
         try {
             fleetManager.saveToFile(filename);
@@ -199,7 +236,7 @@ public class Main {
     }
 
     private static void loadFleet() {
-        System.out.print("Enter filename to load (e.g., sample_fleet.csv): ");
+        System.out.print("Enter filename to load (e.g., fleetdata.csv): ");
         String filename = scanner.nextLine();
         try {
             fleetManager.loadFromFile(filename);
@@ -218,7 +255,7 @@ public class Main {
         } else {
             System.out.println("\nFound " + results.size() + " vehicle(s) of type '" + type + "':");
             for (Vehicle v : results) {
-                v.displayInfo(); // Use the built-in display method
+                v.displayInfo();
             }
         }
     }

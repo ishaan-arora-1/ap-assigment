@@ -57,6 +57,12 @@ public abstract class Vehicle implements Comparable<Vehicle> {
         this.currentMileage += distance;
     }
 
+    public void setMileage(double mileage) {
+        if (mileage >= 0) {
+            this.currentMileage = mileage;
+        }
+    }
+
     @Override
     public int compareTo(Vehicle other){
         return Double.compare(other.calculateFuelEfficiency(), this.calculateFuelEfficiency());

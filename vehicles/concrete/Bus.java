@@ -18,9 +18,11 @@ public class Bus extends LandVehicle implements FuelConsumable,PassengerCarrier,
     private final double cargoCapacity = 500;
     private double currentCargo;
     private boolean maintenanceNeeded;
+    private double mileageAtLastService;
 
     public Bus(String id, String model, double maxSpeed) throws InvalidOperationException {
         super(id, model, maxSpeed, 6);
+        this.mileageAtLastService = 0.0;
     }
     
     @Override
@@ -45,6 +47,7 @@ public class Bus extends LandVehicle implements FuelConsumable,PassengerCarrier,
     public void refuel(double amount) throws InvalidOperationException {
         if (amount<= 0)throw new InvalidOperationException("Refuel amount must be positive");
         this.fuelLevel= this.fuelLevel + amount;
+        System.out.printf("Bus %s refueled with %.1f liters. Current fuel: %.1f L.%n", getId(), amount, this.fuelLevel);
     }
 
     @Override
@@ -103,10 +106,14 @@ public class Bus extends LandVehicle implements FuelConsumable,PassengerCarrier,
     @Override
     public void scheduleMaintenance() {this.maintenanceNeeded = true;}
     @Override
-    public boolean needsMaintenance() {return getCurrentMileage() > 10000 || maintenanceNeeded;}
+    public boolean needsMaintenance() {
+        // Checks mileage *since last service*
+        return (getCurrentMileage() - mileageAtLastService) > 10000 || maintenanceNeeded;
+    }
     @Override
     public void performMaintenance() {
         this.maintenanceNeeded = false;
+        this.mileageAtLastService = getCurrentMileage();
         System.out.println("Maintenance performed on Bus " + getId());
     }
 }

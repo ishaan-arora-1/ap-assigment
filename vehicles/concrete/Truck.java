@@ -15,12 +15,14 @@ public class Truck extends LandVehicle implements FuelConsumable, CargoCarrier, 
     private final double cargoCapacity = 5000;
     private double currentCargo;
     private boolean maintenanceNeeded;
+    private double mileageAtLastService;
 
     public Truck(String id, String model, double maxSpeed) throws InvalidOperationException {
         super(id, model, maxSpeed, 6);
         this.fuelLevel = 0;
         this.currentCargo = 0;
         this.maintenanceNeeded = false;
+        this.mileageAtLastService = 0.0;
     }
 
     @Override
@@ -93,12 +95,14 @@ public class Truck extends LandVehicle implements FuelConsumable, CargoCarrier, 
 
     @Override
     public boolean needsMaintenance() {
-        return getCurrentMileage() > 10000 || maintenanceNeeded;
+        // Checks mileage *since last service*
+        return (getCurrentMileage() - mileageAtLastService) > 10000 || maintenanceNeeded;
     }
 
     @Override
     public void performMaintenance() {
         this.maintenanceNeeded = false;
+        this.mileageAtLastService = getCurrentMileage();
         System.out.println("Maintenance performed on Truck " + getId() + ".");
     }
 }

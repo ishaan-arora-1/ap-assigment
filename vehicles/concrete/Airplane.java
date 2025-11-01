@@ -18,9 +18,11 @@ public class Airplane extends AirVehicle implements FuelConsumable, PassengerCar
     private final double cargoCapacity = 10000; 
     private double currentCargo;
     private boolean maintenanceNeeded;
+    private double mileageAtLastService;
 
     public Airplane(String id, String model, double maxSpeed, double maxAltitude) throws InvalidOperationException {
         super(id, model, maxSpeed, maxAltitude);
+        this.mileageAtLastService = 0.0;
     }
 
     @Override
@@ -34,6 +36,7 @@ public class Airplane extends AirVehicle implements FuelConsumable, PassengerCar
     public void refuel(double amount) throws InvalidOperationException {
         if (amount <= 0) throw new InvalidOperationException("Refuel amount must be positive.");
         this.fuelLevel = this.fuelLevel + amount;
+        System.out.printf("Airplane %s refueled with %.1f liters. Current fuel: %.1f L.%n", getId(), amount, this.fuelLevel);
     }
 
     @Override
@@ -99,11 +102,15 @@ public class Airplane extends AirVehicle implements FuelConsumable, PassengerCar
     public void scheduleMaintenance(){this.maintenanceNeeded=true;}
 
     @Override
-    public boolean needsMaintenance(){ return getCurrentMileage() > 10000 || maintenanceNeeded; }
+    public boolean needsMaintenance() {
+        // Checks mileage *since last service*
+        return (getCurrentMileage() - mileageAtLastService) > 10000 || maintenanceNeeded;
+    }
 
     @Override
     public void performMaintenance(){
         this.maintenanceNeeded=false;
+        this.mileageAtLastService = getCurrentMileage();
         System.out.println("Maintenance performed on Airplane " + getId());
     }
 

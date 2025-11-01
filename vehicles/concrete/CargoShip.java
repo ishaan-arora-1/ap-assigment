@@ -12,10 +12,12 @@ public class CargoShip extends WaterVehicle implements CargoCarrier, Maintainabl
     private final double cargoCapacity = 50000; // kg
     private double currentCargo;
     private boolean maintenanceNeeded;
+    private double mileageAtLastService;
     private double fuelLevel;
 
     public CargoShip(String id, String model, double maxSpeed, boolean hasSail) throws InvalidOperationException {
         super(id, model, maxSpeed, hasSail);
+        this.mileageAtLastService = 0.0;
     }
     
     @Override
@@ -58,10 +60,14 @@ public class CargoShip extends WaterVehicle implements CargoCarrier, Maintainabl
     @Override
     public void scheduleMaintenance() { this.maintenanceNeeded = true; }
     @Override
-    public boolean needsMaintenance() { return getCurrentMileage() > 10000 || maintenanceNeeded; }
+    public boolean needsMaintenance() {
+        // Checks mileage *since last service*
+        return (getCurrentMileage() - mileageAtLastService) > 10000 || maintenanceNeeded;
+    }
     @Override
     public void performMaintenance() {
         this.maintenanceNeeded = false;
+        this.mileageAtLastService = getCurrentMileage();
         System.out.println("Maintenance performed on CargoShip " + getId() + ".");
     }
 
